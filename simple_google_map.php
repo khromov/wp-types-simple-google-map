@@ -33,6 +33,10 @@ License: GPL2
 
  */
 
+/** Load dependencies **/
+if ( ! class_exists( 'MicroTemplate_v3' ) && ! class_exists( 'MT_v3' ) )
+	include( 'lib/microtemplate.class.php' );
+
 //Add registration hook
 add_filter( 'types_register_fields', 'types_simple_google_map' );
 
@@ -56,8 +60,8 @@ function wpcf_fields_simple_google_map() {
 	return array(
 		'path' => __FILE__, // This is required
 		'id' => 'simple_google_map',
-		'title' => __( 'Simple Google map', 'wpcf' ),
-		'description' => __( 'This is additional field', 'wpcf' ),
+		'title' => __( 'Simple Google Map'),
+		'description' => __( 'This is additional field'),
 		/*
 		 * Validation
 		 */
@@ -120,14 +124,14 @@ function wpcf_fields_simple_google_map() {
  * @return string
  */
 function wpcf_fields_simple_google_map_insert_form() {
-	/*
+
 	$form['additional'] = array(
 		'#type' => 'textfield',
 		'#description' => 'Add some comment',
 		'#name' => 'comment',
 	);
 	return $form;
-	*/
+
 }
 
 /**
@@ -137,8 +141,8 @@ function wpcf_fields_simple_google_map_meta_box_form( $data ) {
 	$form['name'] = array(
 		'#name' => 'wpcf[' . $data['slug'] . ']', // Set this to override default output
 		'#type' => 'textfield',
-		'#title' => __( 'Enter address or coordinates', 'wpcf' ),
-		'#description' => ''
+		'#title' => __( 'Enter address or coordinates'),
+		'#description' => __('gmaps description + logo') //FIXME
 	);
 	return $form;
 }
@@ -148,26 +152,79 @@ function wpcf_fields_simple_google_map_meta_box_form( $data ) {
  *
  * This form will be showed in editor popup
  */
-function wpcf_fields_simple_google_map_editor_callback( $field, $settings ) {
-	ob_start();
+function wpcf_fields_simple_google_map_editor_callback( $field, $settings )
+{
+	ob_start();	?>
 
-	?>
-	<label><input type="text" name="width" value="<?php echo isset( $settings['width'] ) ? $settings['width'] : '425'; ?>" />&nbsp;<?php _e('Width', 'wpcf'); ?></label>
+	<h3>
+		Google Maps Integration
+	</h3>
+	<input type="radio" name="maptypeselectgroup" value="iframe"> <?php _e('iFrame API'); ?> <br>
+	<input type="radio" name="maptypeselectgroup" value="image" checked> <?php _e('Image API'); ?> <br>
+
+	<hr/>
+
+	<h3>
+		Map display settings
+	</h3>
+
+	<input type="radio" name="fluid" value="1"> <?php _e('Fluid (100% of container)'); ?> <br>
+	<input type="radio" name="fluid" value="0" checked> <?php _e('Fixed width'); ?> <br>
+
+	<hr/>
+
+	<h3>
+		Fixed width settings
+	</h3>
+
+	<span style="display: block; margin-top: 5px; color: gray; font-style: italic; ">
+		<?php _e('When using the Image API, enter the width and height as numbers only (no percent allowed). You can style the image output via CSS.'); ?>
+	</span>
+
+	<span style="display: block; margin-top: 5px; color: gray; font-style: italic; ">
+		<?php _e('Enter the width and height as numbers only. Add the % sign to use a fluid layout. Example: 456, 25%'); ?>
+	</span>
+
+	<label>
+		<input type="text" name="width" value="<?php echo isset( $settings['width'] ) ? $settings['width'] : '425'; ?>" />&nbsp;
+		<?php _e('Width'); ?>
+	</label>
 	<br />
-	<label><input type="text" name="height" value="<?php echo isset( $settings['height'] ) ? $settings['height'] : '350'; ?>" />&nbsp;<?php _e('Height', 'wpcf'); ?></label>
+
+	<label>
+		<input type="text" name="height" value="<?php echo isset( $settings['height'] ) ? $settings['height'] : '350'; ?>" />&nbsp;<?php _e('Height', 'wpcf'); ?>
+	</label>
 	<br />
-	<label><input type="checkbox" name="image" value="1">&nbsp;<?php _e('Use Google Maps Image API instead of iframe', 'wpcf'); ?></label>
-	<span style="display: block; margin-top: 5px; color: gray; font-style: italic; "><?php _e('Note: When using the Image API, enter the width and height as numbers only (no percent allowed). You can style the image output via CSS.'); ?></span>
-	<label><input type="text" name="image_zoomlevel" value="<?php echo isset( $settings['image_zoomlevel'] ) ? $settings['image_zoomlevel'] : '13'; ?>" />&nbsp;<?php _e('Zoom level (For Image API only)', 'wpcf'); ?></label>
-	<br />
+
+	<!--
+	<label>
+		<input type="checkbox" name="image" value="1">&nbsp;<?php _e('Use Google Maps Image API instead of iframe', 'wpcf'); ?>
+	</label>
+	-->
+
+	<h3>
+		Zoom level
+	</h3>
+	<input id="defaultSlider" type="range" min="1" max="32" value="1" />
+
+	<!-- FIXME: make it purdy<br/> -->
+	<output onforminput="value=range.value">0</output>
+
+	<label>
+		<input type="text" name="image_zoomlevel" value="<?php echo isset( $settings['image_zoomlevel'] ) ? $settings['image_zoomlevel'] : '13'; ?>" />
+		<br/>
+		<?php _e('Zoom level (For Image API only)', 'wpcf'); ?>
+	</label>
+
 	<?php
 	$form = ob_get_contents();
 	ob_get_clean();
+
 	return array(
 		'tabs' => array(
 			'display' => array(
 				'menu_title' => __( 'Display', 'wpcf' ),
-				'title' => __( 'Display', 'wpcf' ),
+				'title' => __( 'Google Maps Settings', 'wpcf' ),
 				'content' => $form,
 			)
 		)
@@ -192,6 +249,11 @@ function wpcf_fields_simple_google_map_editor_submit( $data, $field ) {
 	}
 	if ( !empty( $data['image'] ) ) {
 		$add .= ' image_zoomlevel="' . intval($data['image_zoomlevel']) . '"';
+	}
+
+	if(!empty($data['maptypeselectgroup']))
+	{
+		$add .= " maptypeselectgroup=\"{$data['maptypeselectgroup']}\"";
 	}
 
 	// Generate and return shortcode
