@@ -156,65 +156,141 @@ function wpcf_fields_simple_google_map_editor_callback( $field, $settings )
 {
 	ob_start();	?>
 
-	<h3>
-		Google Maps Integration
-	</h3>
-	<input type="radio" name="maptypeselectgroup" value="iframe"> <?php _e('iFrame API'); ?> <br>
-	<input type="radio" name="maptypeselectgroup" value="image" checked> <?php _e('Image API'); ?> <br>
+	<!-- CSS -->
+	<style type="text/css">
+		#types-google-maps-container
+		{
+			margin: 0;
+			padding: 0;
+		}
+		#types-google-maps-container input[type='text']
+		{
+			width: 45px;
+		}
+		#types-google-maps-container span.info
+		{
+			display: block;
+			margin-top: 5px;
+			color: gray;
+			font-style: italic;
+		}
+		#types-google-maps-container hr
+		{
+			display: block;
+			height: 1px;
+			border: 0;
+			border-top: 1px solid #ccc;
+			margin: 1em 0;
+		}
+		#types-google-maps-container ul.form-list > li > input
+		{
+			float: left;
+			margin-right: 10px;
+		}
+		#types-google-maps-container ul.form-list
+		{
+			overflow: hidden;
+		}
+	</style>
 
-	<hr/>
+	<!-- JavaScript -->
+	<script type="text/javascript">
+		jQuery( document ).ready(function()
+		{
+			jQuery("input[name=maptypeselectgroup]").click(function()
+			{
+				alert("selected");
+			});
+		});
+		function toggle_boxes_info()
+		{
+			
+		}
+	</script>
 
-	<h3>
-		Map display settings
-	</h3>
+	<div id="types-google-maps-container">
+		<h3>
+			<?php _e('Google Maps Integration'); ?>
+		</h3>
+		<ul class="form-multichoice-list form-list">
+			<li>
+				<input type="radio" name="maptypeselectgroup" value="iframe" id="apiselect-iframe" checked>
+				<label for="apiselect-iframe">
+					<?php _e('iFrame API'); ?>
+					<a href="http://dn.se" target="_blank">
+						<?php _e('?'); ?>
+					</a>
+				</label>
+			</li>
+			<li>
 
-	<input type="radio" name="fluid" value="1"> <?php _e('Fluid (100% of container)'); ?> <br>
-	<input type="radio" name="fluid" value="0" checked> <?php _e('Fixed width'); ?> <br>
+				<input type="radio" name="maptypeselectgroup" value="image" id="apiselect-image">
+				<label for="apiselect-image">
+					<?php _e('Image API'); ?>
+					<a href="http://dn.se" target="_blank">
+						<?php _e('?'); ?>
+					</a>
+				</label>
 
-	<hr/>
 
-	<h3>
-		Fixed width settings
-	</h3>
+			</li>
+		</ul>
 
-	<span style="display: block; margin-top: 5px; color: gray; font-style: italic; ">
-		<?php _e('When using the Image API, enter the width and height as numbers only (no percent allowed). You can style the image output via CSS.'); ?>
-	</span>
+		<hr/>
 
-	<span style="display: block; margin-top: 5px; color: gray; font-style: italic; ">
-		<?php _e('Enter the width and height as numbers only. Add the % sign to use a fluid layout. Example: 456, 25%'); ?>
-	</span>
+		<h3>
+			Map display settings
+		</h3>
 
-	<label>
-		<input type="text" name="width" value="<?php echo isset( $settings['width'] ) ? $settings['width'] : '425'; ?>" />&nbsp;
-		<?php _e('Width'); ?>
-	</label>
-	<br />
+		<input type="radio" name="fluid" value="1"> <?php _e('Fluid (100% of container)'); ?> <br>
+		<input type="radio" name="fluid" value="0" checked> <?php _e('Fixed width'); ?> <br>
 
-	<label>
-		<input type="text" name="height" value="<?php echo isset( $settings['height'] ) ? $settings['height'] : '350'; ?>" />&nbsp;<?php _e('Height', 'wpcf'); ?>
-	</label>
-	<br />
+		<hr/>
 
-	<!--
-	<label>
-		<input type="checkbox" name="image" value="1">&nbsp;<?php _e('Use Google Maps Image API instead of iframe', 'wpcf'); ?>
-	</label>
-	-->
+		<h3>
+			Fixed width settings
+		</h3>
 
-	<h3>
-		Zoom level
-	</h3>
-	<input id="defaultSlider" type="range" min="1" max="32" value="1" />
+		<span class="info" id="info-api-image">
+			<?php _e('When using the Image API, enter the width and height as numbers only (no percent allowed). You can style the image output via CSS.'); ?>
+		</span>
 
-	<!-- FIXME: make it purdy<br/> -->
-	<output onforminput="value=range.value">0</output>
+		<span style="display: block; margin-top: 5px; color: gray; font-style: italic; ">
+			<?php _e('Enter the width and height as numbers only. Add the % sign to use a fluid layout. Example: 456, 25%'); ?>
+		</span>
 
-	<label>
-		<input type="text" name="image_zoomlevel" value="<?php echo isset( $settings['image_zoomlevel'] ) ? $settings['image_zoomlevel'] : '13'; ?>" />
-		<br/>
-		<?php _e('Zoom level (For Image API only)', 'wpcf'); ?>
-	</label>
+		<label>
+			<input type="text" name="width" value="<?php echo isset( $settings['width'] ) ? $settings['width'] : '425'; ?>" />&nbsp;
+			<?php _e('Width'); ?>
+		</label>
+
+
+		<label>
+			<input type="text" name="height" value="<?php echo isset( $settings['height'] ) ? $settings['height'] : '350'; ?>" />&nbsp;<?php _e('Height', 'wpcf'); ?>
+		</label>
+
+		<!--
+		<label>
+			<input type="checkbox" name="image" value="1">&nbsp;<?php _e('Use Google Maps Image API instead of iframe', 'wpcf'); ?>
+		</label>
+		-->
+
+		<h3>
+			Zoom level
+		</h3>
+		<input id="defaultSlider" type="range" min="1" max="32" value="13" />
+
+		<!-- FIXME: make it purdy<br/> -->
+		<output onforminput="value=range.value">
+			0
+		</output>
+
+		<label>
+			<input type="text" name="image_zoomlevel" value="<?php echo isset( $settings['image_zoomlevel'] ) ? $settings['image_zoomlevel'] : '13'; ?>" />
+			<br/>
+			<?php _e('Zoom level (For Image API only)', 'wpcf'); ?>
+		</label>
+	</div>
 
 	<?php
 	$form = ob_get_contents();
